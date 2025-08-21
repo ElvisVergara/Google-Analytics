@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empresa Ejemplo - Servicios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      width: 350px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+      display: none;
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      background: #43a047;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2e7d32;
+    }
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #2e7d32;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Registro -->
+  <div class="card" id="registroCard">
+    <h2>Registro de Usuario</h2>
+    <form id="registerForm">
+      <label>Nombre:</label>
+      <input type="text" id="nombre" required>
+      
+      <label>Apellidos:</label>
+      <input type="text" id="apellidos" required>
+      
+      <label>Correo electrónico:</label>
+      <input type="email" id="correo" required>
+      
+      <label>Teléfono:</label>
+      <input type="tel" id="telefono" required>
+      
+      <label>Edad:</label>
+      <input type="number" id="edad" min="10" max="100" required>
+      
+      <label>Contraseña:</label>
+      <input type="password" id="password" required>
+      
+      <button type="submit">Registrar</button>
+    </form>
+    <p class="msg" id="msgRegistro"></p>
+  </div>
+
+  <!-- Login -->
+  <div class="card" id="loginCard">
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+      <label>Correo electrónico:</label>
+      <input type="email" id="loginCorreo" required>
+      
+      <label>Contraseña:</label>
+      <input type="password" id="loginPassword" required>
+      
+      <button type="submit">Login</button>
+    </form>
+    <p class="msg" id="msgLogin"></p>
+    <button onclick="volverInicio()">Volver al Inicio</button>
+  </div>
+
+  <!-- Selección de Servicio -->
+  <div class="card" id="servicioCard">
+    <h2>Selecciona un Servicio</h2>
+    <form id="serviceForm">
+      <label>Servicio:</label>
+      <select id="servicio" required>
+        <option value="">-- Selecciona --</option>
+        <option value="Consultoría">Consultoría</option>
+        <option value="Desarrollo Web">Desarrollo Web</option>
+        <option value="Soporte Técnico">Soporte Técnico</option>
+      </select>
+      <button type="submit">Guardar Servicio</button>
+    </form>
+    <p class="msg" id="msgServicio"></p>
+    <button onclick="volverInicio()">Volver al Inicio</button>
+  </div>
+
+  <script>
+    const registroCard = document.getElementById("registroCard");
+    const loginCard = document.getElementById("loginCard");
+    const servicioCard = document.getElementById("servicioCard");
+
+    registroCard.style.display = "block"; // Mostrar registro al inicio
+
+    const registerForm = document.getElementById("registerForm");
+    const loginForm = document.getElementById("loginForm");
+    const serviceForm = document.getElementById("serviceForm");
+
+    // Registro
+    registerForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = {
+        nombre: document.getElementById("nombre").value,
+        apellidos: document.getElementById("apellidos").value,
+        correo: document.getElementById("correo").value,
+        telefono: document.getElementById("telefono").value,
+        edad: document.getElementById("edad").value,
+        password: document.getElementById("password").value,
+        servicio: null
+      };
+      localStorage.setItem("usuario", JSON.stringify(user));
+      document.getElementById("msgRegistro").innerText = "Usuario registrado ✅";
+      setTimeout(() => {
+        registroCard.style.display = "none";
+        loginCard.style.display = "block";
+      }, 1000);
+    });
+
+    // Login
+    loginForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const savedUser = JSON.parse(localStorage.getItem("usuario"));
+      const correo = document.getElementById("loginCorreo").value;
+      const password = document.getElementById("loginPassword").value;
+      
+      if (savedUser && savedUser.correo === correo && savedUser.password === password) {
+        document.getElementById("msgLogin").innerText = "Login exitoso 🎉 Bienvenido " + savedUser.nombre;
+        setTimeout(() => {
+          loginCard.style.display = "none";
+          servicioCard.style.display = "block";
+        }, 1000);
+      } else {
+        document.getElementById("msgLogin").innerText = "Credenciales incorrectas ❌";
+      }
+    });
+
+    // Selección de servicio
+    serviceForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      let savedUser = JSON.parse(localStorage.getItem("usuario"));
+      savedUser.servicio = document.getElementById("servicio").value;
+      localStorage.setItem("usuario", JSON.stringify(savedUser));
+      document.getElementById("msgServicio").innerText = "Servicio guardado ✅ (" + savedUser.servicio + ")";
+    });
+
+    // Función volver al inicio (registro vacío)
+    function volverInicio() {
+      loginCard.style.display = "none";
+      servicioCard.style.display = "none";
+      registroCard.style.display = "block";
+      registerForm.reset();
+      document.getElementById("msgRegistro").innerText = "";
+    }
+  </script>
+
+  <!-- Google Analytics (reemplaza G-XXXXXXX por tu ID real de medición) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXX');
+  </script>
+
+</body>
+</html>
